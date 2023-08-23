@@ -1,35 +1,3 @@
-// package DAO;
-
-// import Model.Message;
-// import Util.ConnectionUtil;
-
-// import java.sql.*;
-// import java.util.List;
-
-// public class MessageDAO {
-
-//     public Message createMessage(Message message) {
-//         return null;
-//     }
-
-//     public List<Message> getAllMessages() {
-//         return null;
-//     }
-
-//     public Message getMessageById(long messageId) {
-//         return null;
-//     }
-
-//     public boolean deleteMessage(long messageId) {
-//         return false;
-//     }
-
-//     public Message updateMessage(long messageId, Object messageText) {
-//         return null;
-//     }
-
-// }
-
 package DAO;
 
 import java.sql.*;
@@ -40,11 +8,11 @@ import Util.ConnectionUtil;
 
 public class MessageDAO {
     
-    // private final Connection connection;
+    private final Connection connection;
     
-    // public MessageDAO(Connection connection) {
-    //     this.connection = connection;
-    // }
+    public MessageDAO() {
+        this.connection = ConnectionUtil.getConnection();
+    }
 
     // public List<Message> findAll() throws SQLException {
     //     List<Message> messages = new ArrayList<>();
@@ -69,17 +37,34 @@ public class MessageDAO {
     // }
     
     public Message create(Message message) {
-        String sql = "INSERT INTO Message(posted_by, message_text, time_posted_epoch) VALUES (?, ?, ?)";
-        try (Connection connection = ConnectionUtil.getConnection();
-            PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            // pstmt.setInt(1, message.getPostedBy());
-            // pstmt.setString(2, message.getMessageText());
-            // pstmt.setLong(3, message.getTimePostedEpoch());
-            pstmt.executeUpdate();
-        } catch (Exception e) {
+        String sql = "INSERT INTO Message (posted_by, message_text, time_posted_epoch) VALUES (?, ?, ?)";
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            if (connection == null) {
+                connection = ConnectionUtil.getConnection();
+            }
+            ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+    
+            ps.setInt(1, message.getPosted_by());
+            ps.setString(2, message.getMessage_text());
+            ps.setLong(3, System.currentTimeMillis()); // Assuming current time as epoch
+    
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows > 0) {
+                rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    message.setMessage_id(rs.getInt(1));
+                }
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
+            return null;
         }
-        return message;  // Similarly, return the created message, potentially with its ID.
+        return message;
+
     }
 
     public List<Message> findAll() {

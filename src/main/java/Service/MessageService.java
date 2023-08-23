@@ -71,15 +71,34 @@ package Service;
 
 import java.util.List;
 
+import DAO.AccountDAO;
 import DAO.MessageDAO;
 import Model.Message;
 
 public class MessageService {
 
     private MessageDAO messageDAO = new MessageDAO();
+    private AccountDAO accountDAO = new AccountDAO();
 
     public Message postMessage(Message message) {
-        return messageDAO.create(message);
+        Boolean isValid = isValidMessage(message);
+        System.out.println("isValid: " + isValid);
+        System.out.println("Message Length: " + message.getMessage_text().length());
+        if (isValidMessage(message)) {
+            return messageDAO.create(message);
+        }
+        return null;
+    }
+
+     private boolean isValidMessage(Message message) {
+        if (message.getMessage_text() == null || 
+            message.getMessage_text().isEmpty() || 
+            message.getMessage_text().length() >= 255 || 
+            // Assuming accountDAO.exists checks if an account with the given ID exists
+            !accountDAO.exists(message.getPosted_by())) {
+            return false;
+        }
+        return true;
     }
 
     public List<Message> getAllMessages() {
