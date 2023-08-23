@@ -69,11 +69,13 @@
 
 package Service;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import DAO.AccountDAO;
 import DAO.MessageDAO;
 import Model.Message;
+import io.javalin.http.Context;
 
 public class MessageService {
 
@@ -105,9 +107,16 @@ public class MessageService {
         return messageDAO.findAll();
     }
 
-    public Message getMessageById(int id) {
-        return null;
-        // Use messageDAO.findById() method and return the message
+    public Message getMessageById(Context ctx) throws SQLException {
+        // return messageDAO.findById(id);
+        int messageId = Integer.parseInt(ctx.pathParam("message_id"));
+        Message message = messageDAO.findById(messageId);
+        if (message != null) {
+            ctx.json(message);
+        } else {
+            ctx.status(404);
+        }
+        return message;
     }
     
     // Similarly, add methods for creating, deleting, updating messages, and retrieving messages by user_id.

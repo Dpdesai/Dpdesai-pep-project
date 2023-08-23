@@ -8,7 +8,7 @@ import Util.ConnectionUtil;
 
 public class MessageDAO {
     
-    private final Connection connection;
+    private Connection connection;
     
     public MessageDAO() {
         this.connection = ConnectionUtil.getConnection();
@@ -38,7 +38,6 @@ public class MessageDAO {
     
     public Message create(Message message) {
         String sql = "INSERT INTO Message (posted_by, message_text, time_posted_epoch) VALUES (?, ?, ?)";
-        Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -68,19 +67,38 @@ public class MessageDAO {
     }
 
     public List<Message> findAll() {
-        String sql = "SELECT * FROM Message";
-        List<Message> messages = new ArrayList<>();
-        try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            ResultSet rs = pstmt.executeQuery();
+        String sql="SELECT * FROM Message";
+        List<Message>messages=new ArrayList<>();
+        PreparedStatement pstmt=null;
+        ResultSet rs=null;
+        try {
+            if (connection == null) {
+                connection = ConnectionUtil.getConnection();
+            }
+            pstmt=connection.prepareStatement(sql);
+            rs=pstmt.executeQuery();
             while (rs.next()) {
-                Message message = new Message(rs.getInt("message_id"), rs.getInt("posted_by"), rs.getString("message_text"), rs.getLong("time_posted_epoch"));
+                Message message=new Message(rs.getInt("message_id"), rs.getInt("posted_by"), rs.getString("message_text"), rs.getLong("time_posted_epoch"));
                 messages.add(message);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
+    
         return messages;
     }
+
+    public Message findById(int id) throws SQLException {
+        String FIND_BY_ID_QUERY = "SELECT * FROM Message WHERE message_id = ?";
+        PreparedStatement pstmt = connection.prepareStatement(FIND_BY_ID_QUERY);
+        pstmt.setInt(1, id);
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) {
+            return new Message(rs.getInt("message_id"), rs.getInt("posted_by"), rs.getString("message_text"), rs.getLong("time_posted_epoch"));
+        }
+        return null;
+    }
+    
     
 }
