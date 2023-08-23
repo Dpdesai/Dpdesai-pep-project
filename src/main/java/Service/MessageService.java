@@ -124,7 +124,5 @@ public class MessageService {
     public List<Message> getMessagesByAccountId(int accountId) {
         return messageDAO.findMessagesByAccountId(accountId);
     }
-
-
     
 }

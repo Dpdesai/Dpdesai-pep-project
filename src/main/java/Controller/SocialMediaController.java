@@ -137,12 +137,7 @@ public class SocialMediaController {
         int messageId = Integer.parseInt(ctx.pathParam("message_id"));
         ObjectMapper mapper = new ObjectMapper();
         Message messageToBeUpdated = mapper.readValue(ctx.body(), Message.class);
-        
-        System.out.println("what is messageId" + messageId);
-        System.out.println("What is newText: " + messageToBeUpdated);
-
         Message updatedMessage = messageService.updateMessageText(messageId, messageToBeUpdated.getMessage_text());
-        System.out.println("Message text response" + updatedMessage);
         if (updatedMessage != null) {
             ctx.status(200).json(updatedMessage);
         } else {
