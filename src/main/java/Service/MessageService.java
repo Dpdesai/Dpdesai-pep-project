@@ -107,15 +107,16 @@ public class MessageService {
         return messageDAO.findAll();
     }
 
-    public Message getMessageById(Context ctx) throws SQLException {
-        // return messageDAO.findById(id);
-        int messageId = Integer.parseInt(ctx.pathParam("message_id"));
-        Message message = messageDAO.findById(messageId);
-        if (message != null) {
-            ctx.json(message);
-        } else {
-            ctx.status(404);
-        }
+    public Message getMessageById(int messageId) throws SQLException {
+        return messageDAO.findById(messageId);
+
+        // return messageDAO.findById(message_id);
+
+    }
+
+    public Message deleteMessageById(String messageId) throws SQLException {
+        Message message = messageDAO.findById(Integer.parseInt(messageId));
+        System.out.println("Looking for a message" + message);
         return message;
     }
     

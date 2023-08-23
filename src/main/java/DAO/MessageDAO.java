@@ -89,15 +89,31 @@ public class MessageDAO {
         return messages;
     }
 
+    /**
+     * @param id
+     * @return
+     * @throws SQLException
+     */
     public Message findById(int id) throws SQLException {
         String FIND_BY_ID_QUERY = "SELECT * FROM Message WHERE message_id = ?";
-        PreparedStatement pstmt = connection.prepareStatement(FIND_BY_ID_QUERY);
-        pstmt.setInt(1, id);
-        ResultSet rs = pstmt.executeQuery();
-        if (rs.next()) {
-            return new Message(rs.getInt("message_id"), rs.getInt("posted_by"), rs.getString("message_text"), rs.getLong("time_posted_epoch"));
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        Message message = null;
+        try {
+            if (connection == null) {
+                connection = ConnectionUtil.getConnection();
+            }
+            pstmt = connection.prepareStatement(FIND_BY_ID_QUERY);
+            pstmt.setInt(1, id);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                message = new Message(rs.getInt("message_id"), rs.getInt("posted_by"), rs.getString("message_text"), rs.getLong("time_posted_epoch"));
+            }
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());
         }
-        return null;
+        return message;
+    
     }
     
     
