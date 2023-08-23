@@ -109,15 +109,10 @@ public class MessageService {
 
     public Message getMessageById(int messageId) throws SQLException {
         return messageDAO.findById(messageId);
-
-        // return messageDAO.findById(message_id);
-
     }
 
-    public Message deleteMessageById(String messageId) throws SQLException {
-        Message message = messageDAO.findById(Integer.parseInt(messageId));
-        System.out.println("Looking for a message" + message);
-        return message;
+    public Message deleteMessageById(int messageId) throws SQLException {
+        return messageDAO.deleteById(messageId);
     }
     
     // Similarly, add methods for creating, deleting, updating messages, and retrieving messages by user_id.

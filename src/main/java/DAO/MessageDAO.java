@@ -115,6 +115,26 @@ public class MessageDAO {
         return message;
     
     }
+
+    public Message deleteById(int id) throws SQLException {
+        String DELETE_BY_ID_QUERY = "DELETE FROM Message WHERE message_id = ?";
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        Message message = findById(id);  // Retrieve the message first
+
+        try {
+            if (connection == null) {
+                connection = ConnectionUtil.getConnection();
+            }
+            pstmt = connection.prepareStatement(DELETE_BY_ID_QUERY);
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return message;
+    }
     
     
 }

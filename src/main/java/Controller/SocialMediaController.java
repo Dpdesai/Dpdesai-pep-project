@@ -44,7 +44,7 @@ public class SocialMediaController {
         app.post("/messages", this::messageHandler);
         app.get("/messages", this::getAllMessageHandler);
         app.get("/messages/{message_id}", this::getMessageByIdHandler);
-        // app.get("/messages/{message_id}", this::deleteMessageByIdHandler);
+        app.delete("/messages/{message_id}", this::deleteMessageByIdHandler);
         return app;
     }
 
@@ -110,28 +110,24 @@ public class SocialMediaController {
         ctx.status(200).json(messages);
     }
 
-    
-
     private void getMessageByIdHandler(Context ctx) throws SQLException, JsonProcessingException {
         int messageId = Integer.parseInt(ctx.pathParam("message_id"));
         Message message = messageService.getMessageById(messageId);
         if (message != null) {
             ctx.status(200).json(message);
         } else {
-            ctx.status(200);  // Return an empty JSON object if no message found
-        }
-
-        
+            ctx.status(200);
+        } 
     }
 
-    // private void deleteMessageByIdHandler(Context ctx) throws SQLException {
-    //     String messageId = ctx.pathParam("message_id");
-    //     Message message = messageService.deleteMessageById(ctx.pathParam(messageId));
-    //     if (message != null) {
-    //     ctx.status(200).json(message);
-    //     } else {
-    //         ctx.status(404);
-    //     }
-    // }
+    private void deleteMessageByIdHandler(Context ctx) throws SQLException {
+        int messageId = Integer.parseInt(ctx.pathParam("message_id"));
+        Message message = messageService.deleteMessageById(messageId);
+        if (message != null) {
+            ctx.status(200).json(message);
+        } else {
+            ctx.status(200); 
+        }
+    }
 
 }
