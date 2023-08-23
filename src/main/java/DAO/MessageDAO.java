@@ -14,28 +14,6 @@ public class MessageDAO {
         this.connection = ConnectionUtil.getConnection();
     }
 
-    // public List<Message> findAll() throws SQLException {
-    //     List<Message> messages = new ArrayList<>();
-    //     String sql = "SELECT * FROM Message";
-    //     PreparedStatement stmt = connection.prepareStatement(sql);
-    //     ResultSet rs = stmt.executeQuery();
-    //     while (rs.next()) {
-    //         messages.add(new Message(rs.getInt("message_id"), rs.getInt("posted_by"), rs.getString("message_text"), rs.getLong("time_posted_epoch")));
-    //     }
-    //     return messages;
-    // }
-
-    // public Message findById(int id) throws SQLException {
-    //     String sql = "SELECT * FROM Message WHERE message_id = ?";
-    //     PreparedStatement stmt = connection.prepareStatement(sql);
-    //     stmt.setInt(1, id);
-    //     ResultSet rs = stmt.executeQuery();
-    //     if (rs.next()) {
-    //         return new Message(rs.getInt("message_id"), rs.getInt("posted_by"), rs.getString("message_text"), rs.getLong("time_posted_epoch"));
-    //     }
-    //     return null;
-    // }
-    
     public Message create(Message message) {
         String sql = "INSERT INTO Message (posted_by, message_text, time_posted_epoch) VALUES (?, ?, ?)";
         PreparedStatement ps = null;
@@ -95,7 +73,7 @@ public class MessageDAO {
      * @throws SQLException
      */
     public Message findById(int id) throws SQLException {
-        String FIND_BY_ID_QUERY = "SELECT * FROM Message WHERE message_id = ?";
+        String sql = "SELECT * FROM Message WHERE message_id = ?";
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         Message message = null;
@@ -103,7 +81,7 @@ public class MessageDAO {
             if (connection == null) {
                 connection = ConnectionUtil.getConnection();
             }
-            pstmt = connection.prepareStatement(FIND_BY_ID_QUERY);
+            pstmt = connection.prepareStatement(sql);
             pstmt.setInt(1, id);
             rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -117,7 +95,7 @@ public class MessageDAO {
     }
 
     public Message deleteById(int id) throws SQLException {
-        String DELETE_BY_ID_QUERY = "DELETE FROM Message WHERE message_id = ?";
+        String sql = "DELETE FROM Message WHERE message_id = ?";
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         Message message = findById(id);  // Retrieve the message first
@@ -126,7 +104,7 @@ public class MessageDAO {
             if (connection == null) {
                 connection = ConnectionUtil.getConnection();
             }
-            pstmt = connection.prepareStatement(DELETE_BY_ID_QUERY);
+            pstmt = connection.prepareStatement(sql);
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
         } catch(SQLException e) {
@@ -136,5 +114,26 @@ public class MessageDAO {
         return message;
     }
     
+    public Message updateMessageTextById(int id, String newText) {
+        String sql = "UPDATE Message SET message_text = ? WHERE message_id = ?";
+        PreparedStatement pstmt = null;
+        Message message = null;
+
+        try {
+            connection = ConnectionUtil.getConnection();
+            pstmt = connection.prepareStatement(sql);
+            pstmt.setString(1, newText);
+            pstmt.setInt(2, id);
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows > 0) {
+                message = findById(id);
+            }
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return message;  
+    }
     
 }

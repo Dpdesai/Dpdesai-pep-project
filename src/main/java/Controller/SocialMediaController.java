@@ -45,6 +45,7 @@ public class SocialMediaController {
         app.get("/messages", this::getAllMessageHandler);
         app.get("/messages/{message_id}", this::getMessageByIdHandler);
         app.delete("/messages/{message_id}", this::deleteMessageByIdHandler);
+        app.patch("/messages/{message_id}", this::updateMessageHandler);
         return app;
     }
 
@@ -127,6 +128,18 @@ public class SocialMediaController {
             ctx.status(200).json(message);
         } else {
             ctx.status(200); 
+        }
+    }
+
+    private void updateMessageHandler(Context ctx) {
+        int messageId = Integer.parseInt(ctx.pathParam("message_id"));
+        String newText = ctx.body();
+        Message updatedMessage = messageService.updateMessageText(messageId, newText);
+        System.out.println("Message text response" + updatedMessage);
+        if (updatedMessage != null) {
+            ctx.status(200).json(updatedMessage);
+        } else {
+            ctx.status(400);
         }
     }
 

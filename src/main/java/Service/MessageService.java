@@ -114,6 +114,12 @@ public class MessageService {
     public Message deleteMessageById(int messageId) throws SQLException {
         return messageDAO.deleteById(messageId);
     }
+
+    public Message updateMessageText(int id, String newText) {
+        if (newText == null || newText.trim().isEmpty() || newText.length() > 255) {
+            return null;
+        }
+        return messageDAO.updateMessageTextById(id, newText);
+    }
     
-    // Similarly, add methods for creating, deleting, updating messages, and retrieving messages by user_id.
 }
