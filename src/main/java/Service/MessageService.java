@@ -75,7 +75,6 @@ import java.util.List;
 import DAO.AccountDAO;
 import DAO.MessageDAO;
 import Model.Message;
-import io.javalin.http.Context;
 
 public class MessageService {
 
@@ -116,10 +115,16 @@ public class MessageService {
     }
 
     public Message updateMessageText(int id, String newText) {
-        if (newText == null || newText.trim().isEmpty() || newText.length() > 255) {
+        if (newText == null || newText.trim().isEmpty() || newText.length() >= 255) {
             return null;
         }
         return messageDAO.updateMessageTextById(id, newText);
     }
+
+    public List<Message> getMessagesByAccountId(int accountId) {
+        return messageDAO.findMessagesByAccountId(accountId);
+    }
+
+
     
 }

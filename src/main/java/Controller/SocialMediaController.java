@@ -46,6 +46,8 @@ public class SocialMediaController {
         app.get("/messages/{message_id}", this::getMessageByIdHandler);
         app.delete("/messages/{message_id}", this::deleteMessageByIdHandler);
         app.patch("/messages/{message_id}", this::updateMessageHandler);
+        app.get("/accounts/{account_id}/messages", this::getMessagesByAccountHandler);
+
         return app;
     }
 
@@ -131,16 +133,28 @@ public class SocialMediaController {
         }
     }
 
-    private void updateMessageHandler(Context ctx) {
+    private void updateMessageHandler(Context ctx) throws JsonMappingException, JsonProcessingException {
         int messageId = Integer.parseInt(ctx.pathParam("message_id"));
-        String newText = ctx.body();
-        Message updatedMessage = messageService.updateMessageText(messageId, newText);
+        ObjectMapper mapper = new ObjectMapper();
+        Message messageToBeUpdated = mapper.readValue(ctx.body(), Message.class);
+        
+        System.out.println("what is messageId" + messageId);
+        System.out.println("What is newText: " + messageToBeUpdated);
+
+        Message updatedMessage = messageService.updateMessageText(messageId, messageToBeUpdated.getMessage_text());
         System.out.println("Message text response" + updatedMessage);
         if (updatedMessage != null) {
             ctx.status(200).json(updatedMessage);
         } else {
             ctx.status(400);
         }
+    }
+
+    private void getMessagesByAccountHandler(Context ctx) {
+        int accountId = Integer.parseInt(ctx.pathParam("account_id"));
+        List<Message> messages = messageService.getMessagesByAccountId(accountId);
+        ctx.json(messages).status(200);
+
     }
 
 }

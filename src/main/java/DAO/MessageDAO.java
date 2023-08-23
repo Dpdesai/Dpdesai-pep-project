@@ -97,7 +97,6 @@ public class MessageDAO {
     public Message deleteById(int id) throws SQLException {
         String sql = "DELETE FROM Message WHERE message_id = ?";
         PreparedStatement pstmt = null;
-        ResultSet rs = null;
         Message message = findById(id);  // Retrieve the message first
 
         try {
@@ -134,6 +133,31 @@ public class MessageDAO {
         }
         
         return message;  
+    }
+
+    public List<Message> findMessagesByAccountId(int accountId) {
+        List<Message> messages = new ArrayList<>();
+        String sql = "SELECT * FROM Message WHERE posted_by = ?";
+        
+        Connection connection = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            connection = ConnectionUtil.getConnection();
+            pstmt = connection.prepareStatement(sql);
+            pstmt.setInt(1, accountId);
+            rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                Message message = new Message(rs.getInt("message_id"), rs.getInt("posted_by"), rs.getString("message_text"), rs.getLong("time_posted_epoch"));
+                messages.add(message);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } 
+        
+        return messages;
     }
     
 }
